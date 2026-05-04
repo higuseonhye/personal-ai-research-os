@@ -8,6 +8,12 @@ Local-first Python toolkit for turning **customer problems → structured resear
 - **Reproducible runs:** seeded experiments, JSONL logs, SQLite memory.
 - **No SaaS requirement:** metrics, local judge proxies, and template QA run without external APIs (you can swap in your own models later).
 
+## Screenshot
+
+Streamlit dashboard (`ui/app.py`): compile a problem, pick systems, paste JSON input, then review results in the second tab.
+
+![Streamlit research dashboard — Problem & systems tab](assets/research-os-dashboard.png)
+
 ## Layout
 
 | Path | Purpose |
