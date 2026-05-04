@@ -16,6 +16,29 @@ Streamlit dashboard (`ui/app.py`): compile a problem, pick systems, paste JSON i
 
 *Preview image aligned with the current Streamlit layout; replace with your own capture if you prefer a literal runtime screenshot.*
 
+## Demo video
+
+Short walkthrough: compile problem → run experiment across retrievers → open **Results** (metrics, pairwise, insights, memory).
+
+**Recorded asset (commit this file for README + YC upload):** `assets/demo-research-os.mp4` (and/or `assets/demo-research-os.webm`).
+
+<video width="100%" controls playsinline muted>
+  <source src="assets/demo-research-os.mp4" type="video/mp4">
+  <source src="assets/demo-research-os.webm" type="video/webm">
+  Your browser does not support the video tag — open the MP4/WebM files in <code>assets/</code> directly.
+</video>
+
+**Regenerate locally (headless Chromium + Streamlit):**
+
+```bash
+pip install -r requirements-dev.txt
+playwright install chromium
+# optional: install ffmpeg and add to PATH for MP4 export alongside WebM
+python scripts/record_demo_video.py
+```
+
+The script starts Streamlit, drives the UI, and writes `assets/demo-research-os.webm` (always) and `assets/demo-research-os.mp4` when `ffmpeg` is available.
+
 ## Layout
 
 | Path | Purpose |

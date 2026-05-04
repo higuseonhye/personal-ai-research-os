@@ -1,0 +1,3 @@
+# Optional: record demo video (scripts/record_demo_video.py)
+playwright>=1.40.0
+imageio-ffmpeg>=0.4.9
