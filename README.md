@@ -18,7 +18,7 @@ Streamlit dashboard (`ui/app.py`): compile a problem, pick systems, paste JSON i
 
 ## Demo video
 
-Short walkthrough: compile problem → run experiment across retrievers → open **Results** (metrics, pairwise, insights, memory).
+Short walkthrough (~40s): compile problem → run experiment across retrievers → open **Results** (metrics, pairwise, insights, memory). Suitable for YC “demo” upload (well under 3 minutes / 100 MB).
 
 **Recorded asset (commit this file for README + YC upload):** `assets/demo-research-os.mp4` (and/or `assets/demo-research-os.webm`).
 
