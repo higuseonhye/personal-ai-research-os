@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.venv/
+venv/
+ENV/
+
+# Local / secrets
+.env
+.env.*
+*.local
+
+# Research OS runtime artifacts
+data/memory.db
+data/logs/
+*.jsonl
+
+# IDE
+.idea/
+.vscode/
+*.swp
+.DS_Store
+
+# ML caches
+.cache/
+*.pt
+*.bin
