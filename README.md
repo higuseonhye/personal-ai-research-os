@@ -14,6 +14,8 @@ Streamlit dashboard (`ui/app.py`): compile a problem, pick systems, paste JSON i
 
 ![Streamlit research dashboard — Problem & systems tab](assets/research-os-dashboard.png)
 
+*Preview image aligned with the current Streamlit layout; replace with your own capture if you prefer a literal runtime screenshot.*
+
 ## Layout
 
 | Path | Purpose |
