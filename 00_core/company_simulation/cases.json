@@ -1,0 +1,20 @@
+[
+  {
+    "id": "globex_support_wave_01",
+    "company_profile": "Globex SaaS — multi-region B2B; aggressive COGS targets; strict SOC2 posture.",
+    "personas": ["VP Customer Ops", "Security Lead", "Support Manager"],
+    "case_problem": "Reduce Globex customer support cost without lowering SOC2 audit readiness or EU residency guarantees.",
+    "hidden_constraints": ["no_full_automation_on_financial_disputes", "must_log_every_model_output"],
+    "success_criteria": ["cost_per_ticket_down_15pct", "audit_events_complete"],
+    "difficulty": "high"
+  },
+  {
+    "id": "acme_search_permissions",
+    "company_profile": "Acme Knowledge — regulated docs + federated identity.",
+    "personas": ["Legal", "IT Admin", "Research Analyst"],
+    "case_problem": "Ship hybrid semantic search over SharePoint + internal wiki with permission-aware filtering under 250ms p95.",
+    "hidden_constraints": ["acl_enforcement_nonnegotiable", "no_shadow_IT_indexes"],
+    "success_criteria": ["precision_at_10_up", "zero_acl_leaks_in_red_team"],
+    "difficulty": "frontier"
+  }
+]

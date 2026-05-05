@@ -17,6 +17,13 @@ ENV/
 data/memory.db
 data/logs/
 *.jsonl
+!data/enterprise_eval_sample.jsonl
+
+# Benchmark / metrics / learned weights (local or CI-generated)
+data/benchmarks.sqlite3
+data/benchmark_metrics.prom
+data/route_policy.json
+data/sota_ranker_state.json
 
 # IDE
 .idea/

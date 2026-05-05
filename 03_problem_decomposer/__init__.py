@@ -1,0 +1,1 @@
+"""Enterprise → technical problem decomposition."""

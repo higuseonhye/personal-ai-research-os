@@ -1,0 +1,31 @@
+name: Benchmark smoke
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  benchmark:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Run auto-benchmark (sample, limited)
+        env:
+          PA_DISABLE_SOTA_RANKER: "1"
+        run: |
+          python 08_feedback_loop/auto_benchmark.py data/enterprise_eval_sample.jsonl --limit 2 --no-db --notes ci-smoke
+
+      - name: Export Prometheus metrics textfile (SQLite backend)
+        run: |
+          python 08_feedback_loop/auto_benchmark.py data/enterprise_eval_sample.jsonl --limit 1 --notes ci-metrics-export
+          python scripts/export_benchmark_metrics.py --stdout | head -n 40

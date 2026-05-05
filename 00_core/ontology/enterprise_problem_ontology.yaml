@@ -1,0 +1,22 @@
+# Enterprise AI problem taxonomy — maps business language to technical problem families.
+version: "1.0"
+
+cs_automation:
+  - intent_classification
+  - ticket_routing
+  - response_generation
+  - escalation_prediction
+
+search_retrieval:
+  - enterprise_rag
+  - semantic_search
+  - hybrid_search
+
+decision_support:
+  - recommendation_systems
+  - ranking_models
+  - forecasting
+
+workflow_automation:
+  - agent_orchestration
+  - tool_use_systems
