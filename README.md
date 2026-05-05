@@ -94,3 +94,7 @@ Use **`09_apps/streamlit_ui`** for the JSON-first enterprise pipeline. Use **`ui
 1. Subclass `AISystem` in `system_registry/systems/`.
 2. Register in `get_default_registry()` in `system_registry/registry.py`.
 3. Optionally extend `ProblemCompiler` so new systems appear in `suggested_systems`.
+
+## License
+
+Released under the [MIT License](LICENSE).
