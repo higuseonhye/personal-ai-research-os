@@ -14,6 +14,10 @@ Local-first Python toolkit for turning **customer problems → structured resear
 
 ![Enterprise pipeline (left) and benchmark dashboard (right)](assets/readme-dashboards.png)
 
+**SOTA Radar** (`streamlit run 09_apps/sota_radar_dashboard.py`): arXiv ingestion cycles, leaderboard trends, snapshots; **Paper stream** lists **Abstract** and **PDF** links when URLs are present.
+
+![SOTA Radar — paper stream with source links](assets/sota-radar-dashboard.png)
+
 **Research IR dashboard** (`streamlit run ui/app.py`): compile a problem, pick systems, paste JSON input, then review results in the **Results** tab.
 
 ![Research OS — Problem & systems tab](assets/research-os-dashboard.png)
