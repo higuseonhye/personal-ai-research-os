@@ -1,6 +1,6 @@
 # Personal AI Research & Execution OS
 
-Local-first Python toolkit for turning **customer problems → structured research tasks → multi-system experiments → evaluation → insights → durable memory**. It is built for a single advanced operator (architect, researcher, FDE-style execution), not as a SaaS product.
+Local-first Python toolkit for turning **customer problems → structured research tasks → multi-system experiments → evaluation → insights → durable memory**.
 
 ## Principles
 
@@ -81,7 +81,3 @@ Use the **Problem & systems** tab to compile a problem, pick systems, paste JSON
 1. Subclass `AISystem` in `system_registry/systems/`.
 2. Register in `get_default_registry()` in `system_registry/registry.py`.
 3. Optionally extend `ProblemCompiler` so new systems appear in `suggested_systems`.
-
-## License
-
-Use and modify for personal or internal research. Add a license file if you redistribute.
