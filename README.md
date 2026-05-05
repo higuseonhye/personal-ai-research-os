@@ -8,18 +8,22 @@ Local-first Python toolkit for turning **customer problems → structured resear
 - **Reproducible runs:** seeded experiments, JSONL logs, SQLite memory.
 - **No SaaS requirement:** metrics, local judge proxies, and template QA run without external APIs (you can swap in your own models later).
 
-## Screenshot
+## Screenshots
 
-Streamlit dashboard (`ui/app.py`): compile a problem, pick systems, paste JSON input, then review results in the second tab.
+**Enterprise pipeline** (`streamlit run 09_apps/streamlit_ui.py`) and **benchmark runs** (`streamlit run 09_apps/benchmark_dashboard.py`) — representative layouts:
 
-![Streamlit research dashboard — Problem & systems tab](assets/research-os-dashboard.png)
+![Enterprise pipeline (left) and benchmark dashboard (right)](assets/readme-dashboards.png)
 
-*Preview image aligned with the current Streamlit layout; replace with your own capture if you prefer a literal runtime screenshot.*
+**Research IR dashboard** (`streamlit run ui/app.py`): compile a problem, pick systems, paste JSON input, then review results in the **Results** tab.
+
+![Research OS — Problem & systems tab](assets/research-os-dashboard.png)
 
 ## Layout
 
 | Path | Purpose |
 |------|---------|
+| `09_apps/` | Streamlit apps: enterprise pipeline, benchmark history, SOTA radar. |
+| `pipeline.py` | Enterprise runner (full / LangGraph / production entrypoints). |
 | `problem_compiler/` | Natural language → structured task (domain, hypotheses, suggested systems). |
 | `system_registry/` | `AISystem` implementations and registry. |
 | `experiment_engine/` | Run the same input across selected systems; append-only logs under `data/logs/`. |
@@ -59,15 +63,25 @@ python research_os/main.py --systems BM25Retriever DenseRetriever HybridRetrieve
 python main.py --systems BM25Retriever DenseRetriever HybridRetriever
 ```
 
-**Streamlit UI:**
+**Streamlit UIs:**
 
 ```bash
+# Enterprise problem → decomposition → SOTA → architecture → eval → iteration
+streamlit run 09_apps/streamlit_ui.py
+
+# Benchmark history (SQLite / Postgres via env)
+streamlit run 09_apps/benchmark_dashboard.py
+
+# SOTA radar (papers / leaderboard snapshots)
+streamlit run 09_apps/sota_radar_dashboard.py
+
+# Research OS — IR-style experiments across registered systems
 streamlit run research_os/ui/app.py
-# or, from repo root that matches this tree:
+# or, from repo root:
 streamlit run ui/app.py
 ```
 
-Use the **Problem & systems** tab to compile a problem, pick systems, paste JSON input (IR-style: `query`, `corpus`, optional `relevant_ids`, `top_k`), then run. Open **Results** for tables, pairwise output, insights, and failure snapshots.
+Use **`09_apps/streamlit_ui`** for the JSON-first enterprise pipeline. Use **`ui/app`** — **Problem & systems** tab to compile a problem, pick systems, paste JSON input (IR-style: `query`, `corpus`, optional `relevant_ids`, `top_k`), then run. Open **Results** for tables, pairwise output, insights, and failure snapshots.
 
 ## Input hints
 
