@@ -5,7 +5,7 @@ from typing import Any
 import numpy as np
 from sklearn.linear_model import LogisticRegression
 
-from research_os.system_registry.base import AISystem, SystemOutput
+from system_registry.base import AISystem, SystemOutput
 
 
 def _features(row: dict[str, Any]) -> np.ndarray:

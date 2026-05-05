@@ -1,7 +1,7 @@
 """
 Streamlit research dashboard — fast iteration UX.
 Run from repository root:
-  streamlit run research_os/ui/app.py
+  streamlit run ui/app.py
 """
 
 from __future__ import annotations
@@ -10,18 +10,18 @@ import json
 import sys
 from pathlib import Path
 
-_ROOT = Path(__file__).resolve().parents[2]
-if str(_ROOT) not in sys.path:
-    sys.path.insert(0, str(_ROOT))
+_REPO_ROOT = Path(__file__).resolve().parents[1]
+if str(_REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT))
 
 import streamlit as st
 
-from research_os.evaluation_engine import evaluate_record
-from research_os.experiment_engine import ExperimentEngine
-from research_os.insight_engine import InsightEngine
-from research_os.memory import ResearchMemory
-from research_os.problem_compiler import ProblemCompiler
-from research_os.system_registry import get_default_registry
+from evaluation_engine import evaluate_record
+from experiment_engine import ExperimentEngine
+from insight_engine import InsightEngine
+from memory import ResearchMemory
+from problem_compiler import ProblemCompiler
+from system_registry import get_default_registry
 
 DEFAULT_CORPUS = [
     {"id": "d1", "text": "Enterprise VPN requires MFA and device compliance checks."},

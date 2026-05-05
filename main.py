@@ -9,17 +9,17 @@ import json
 import sys
 from pathlib import Path
 
-# Allow `python research_os/main.py` from repo root without installation
-_ROOT = Path(__file__).resolve().parents[1]
+# Allow `python main.py` from repo root without installation
+_ROOT = Path(__file__).resolve().parent
 if str(_ROOT) not in sys.path:
     sys.path.insert(0, str(_ROOT))
 
-from research_os.evaluation_engine import evaluate_record
-from research_os.experiment_engine import ExperimentEngine
-from research_os.insight_engine import InsightEngine
-from research_os.memory import ResearchMemory
-from research_os.problem_compiler import ProblemCompiler
-from research_os.system_registry import get_default_registry
+from evaluation_engine import evaluate_record
+from experiment_engine import ExperimentEngine
+from insight_engine import InsightEngine
+from memory import ResearchMemory
+from problem_compiler import ProblemCompiler
+from system_registry import get_default_registry
 
 
 def _default_ir_input() -> dict:

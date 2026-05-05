@@ -23,6 +23,9 @@ def retrieve_relevant_sota(decomposition: dict[str, Any]) -> dict[str, Any]:
             "year": "2020",
             "relevance": "Baseline enterprise RAG stack and evaluation framing.",
             "methods": ["enterprise_rag", "semantic_search"],
+            "abs_url": "https://arxiv.org/abs/2005.11401",
+            "pdf_url": "https://arxiv.org/pdf/2005.11401.pdf",
+            "source": "arxiv",
         },
         {
             "title": "ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction",
@@ -30,6 +33,9 @@ def retrieve_relevant_sota(decomposition: dict[str, Any]) -> dict[str, Any]:
             "year": "2020",
             "relevance": "High-recall retrieval + reranking for support deflection.",
             "methods": ["hybrid_search", "semantic_search"],
+            "abs_url": "https://arxiv.org/abs/2004.12832",
+            "pdf_url": "https://arxiv.org/pdf/2004.12832.pdf",
+            "source": "arxiv",
         },
         {
             "title": "Toolformer: Language Models Can Teach Themselves to Use Tools",
@@ -37,6 +43,9 @@ def retrieve_relevant_sota(decomposition: dict[str, Any]) -> dict[str, Any]:
             "year": "2023",
             "relevance": "Grounded actions and safe tool use in agentic support workflows.",
             "methods": ["tool_use_systems", "agent_orchestration"],
+            "abs_url": "https://arxiv.org/abs/2302.04761",
+            "pdf_url": "https://arxiv.org/pdf/2302.04761.pdf",
+            "source": "arxiv",
         },
     ]
     mapped = [str(s) for s in subs]

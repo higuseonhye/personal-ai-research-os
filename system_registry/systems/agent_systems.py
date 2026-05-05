@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from typing import Any
 
-from research_os.system_registry.base import AISystem, SystemOutput
+from system_registry.base import AISystem, SystemOutput
 
 
 class RuleBasedAgent(AISystem):

@@ -3,9 +3,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from research_os.evaluation_engine.engine import EvaluationBundle, PerSystemEval
-from research_os.experiment_engine.engine import ExperimentRecord
-from research_os.problem_compiler.compiler import StructuredResearchTask
+from evaluation_engine.engine import EvaluationBundle, PerSystemEval
+from experiment_engine.engine import ExperimentRecord
+from problem_compiler.compiler import StructuredResearchTask
 
 
 @dataclass

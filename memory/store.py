@@ -6,10 +6,10 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from research_os.evaluation_engine.engine import EvaluationBundle
-from research_os.experiment_engine.engine import ExperimentRecord
-from research_os.insight_engine.engine import InsightReport
-from research_os.problem_compiler.compiler import StructuredResearchTask
+from evaluation_engine.engine import EvaluationBundle
+from experiment_engine.engine import ExperimentRecord
+from insight_engine.engine import InsightReport
+from problem_compiler.compiler import StructuredResearchTask
 
 
 def _utc_now() -> str:

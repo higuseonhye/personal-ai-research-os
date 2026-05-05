@@ -1,0 +1,4 @@
+# Reduces terminal noise: default file watcher introspects heavy deps (e.g. transformers → torchvision).
+# App code reload on save may require a manual browser refresh when set to "none".
+[server]
+fileWatcherType = "none"

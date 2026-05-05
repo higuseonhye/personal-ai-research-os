@@ -53,7 +53,8 @@ def main() -> None:
 
     df = pd.DataFrame(runs)
     st.subheader("Recent runs")
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    st.caption(f"{len(df)} run(s). Scroll inside the grid if rows are clipped.")
+    st.dataframe(df, use_container_width=True)
 
     ids = sorted({int(r["run_id"]) for r in runs}, reverse=True)
     rid = st.selectbox("Inspect run_id", ids)
@@ -93,7 +94,11 @@ def main() -> None:
     rdf = pd.DataFrame(rows)
     st.subheader(f"Results for run {rid}")
     drop_cols = [c for c in ("summary",) if c in rdf.columns]
-    st.dataframe(rdf.drop(columns=drop_cols, errors="ignore"), use_container_width=True, hide_index=True)
+    view = rdf.drop(columns=drop_cols, errors="ignore")
+    st.caption(
+        f"{len(view)} datapoint(s). 'Type to search' is Streamlit's table filter; summaries are omitted here."
+    )
+    st.dataframe(view, use_container_width=True)
 
     failures = [r for r in rows if not r.get("ok")]
     if failures:

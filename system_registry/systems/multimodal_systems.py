@@ -4,7 +4,7 @@ import hashlib
 import math
 from typing import Any
 
-from research_os.system_registry.base import AISystem, SystemOutput
+from system_registry.base import AISystem, SystemOutput
 
 from .ir_systems import _stable_shuffle_ids
 

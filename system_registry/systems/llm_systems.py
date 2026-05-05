@@ -4,8 +4,8 @@ import hashlib
 import re
 from typing import Any
 
-from research_os.system_registry.base import AISystem, SystemOutput
-from research_os.system_registry.systems.ir_systems import DenseRetriever
+from system_registry.base import AISystem, SystemOutput
+from system_registry.systems.ir_systems import DenseRetriever
 
 _TOKEN = re.compile(r"\w+", re.UNICODE)
 

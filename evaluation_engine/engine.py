@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
-from research_os.experiment_engine.engine import ExperimentRecord
+from experiment_engine.engine import ExperimentRecord
 
 from .llm_judge import LLMJudgeConfig, extract_candidate_text, llm_judge_scores
 from .metrics import accuracy_score, mean_reciprocal_rank, ndcg_at_k, recall_at_k

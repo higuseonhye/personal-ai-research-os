@@ -56,10 +56,7 @@ pip install -r requirements.txt
 **CLI (one-shot pipeline):**
 
 ```bash
-# From parent of the `research_os` package folder:
-python research_os/main.py --systems BM25Retriever DenseRetriever HybridRetriever
-
-# From inside this folder (when this folder is the repo root):
+# From repo root (this folder is next to main.py):
 python main.py --systems BM25Retriever DenseRetriever HybridRetriever
 ```
 
@@ -76,8 +73,6 @@ streamlit run 09_apps/benchmark_dashboard.py
 streamlit run 09_apps/sota_radar_dashboard.py
 
 # Research OS — IR-style experiments across registered systems
-streamlit run research_os/ui/app.py
-# or, from repo root:
 streamlit run ui/app.py
 ```
 

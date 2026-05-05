@@ -7,7 +7,7 @@ from typing import Any
 
 import numpy as np
 
-from research_os.system_registry.base import AISystem, SystemOutput
+from system_registry.base import AISystem, SystemOutput
 
 _TOKEN = re.compile(r"\w+", re.UNICODE)
 

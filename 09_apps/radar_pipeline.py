@@ -17,6 +17,14 @@ from typing import Any
 
 _ROOT = Path(__file__).resolve().parents[1]
 
+_arxiv_links_spec = importlib.util.spec_from_file_location(
+    "pa_arxiv_links", _ROOT / "04_sota_engine" / "arxiv_links.py"
+)
+_arxiv_links_mod = importlib.util.module_from_spec(_arxiv_links_spec)
+assert _arxiv_links_spec.loader
+_arxiv_links_spec.loader.exec_module(_arxiv_links_mod)
+abs_url_from_pdf_url = _arxiv_links_mod.abs_url_from_pdf_url
+
 
 def _bootstrap_sys_path() -> None:
     import sys
@@ -26,6 +34,33 @@ def _bootstrap_sys_path() -> None:
 
 
 SNAPSHOT_PATH = _ROOT / "data" / "radar_snapshots.jsonl"
+
+
+def paper_source_row(processed: dict[str, Any]) -> dict[str, str]:
+    """Single radar snapshot row: title + source URLs."""
+    pdf = str(processed.get("pdf_url", "") or "")
+    abs_u = str(processed.get("abs_url", "") or "") or abs_url_from_pdf_url(pdf)
+    src = "arxiv" if "arxiv.org" in pdf.lower() else ("external_pdf" if pdf else "")
+    return {
+        "title": str(processed.get("title", "")),
+        "pdf_url": pdf,
+        "abs_url": abs_u,
+        "source": src,
+    }
+
+
+def _paper_stream_payload(processed_papers: list[dict[str, Any]], limit: int = 25) -> list[dict[str, str]]:
+    return [paper_source_row(p) for p in processed_papers[:limit]]
+
+
+def _safe_float(val: Any, default: float) -> float:
+    """Snapshots JSON may store numeric metrics as \"\" when unknown; avoid float(\"\")."""
+    if val is None or val == "":
+        return default
+    try:
+        return float(val)
+    except (TypeError, ValueError):
+        return default
 
 
 def _load_pipeline_bits():
@@ -95,25 +130,28 @@ def build_radar_snapshot(
     prev_snapshot: dict[str, Any] | None,
 ) -> dict[str, Any]:
     ts = datetime.now(timezone.utc).isoformat()
-    titles = [str(p.get("title", "")) for p in processed_papers][:25]
+    new_papers = _paper_stream_payload(processed_papers, 25)
 
     clusters = Counter(_cluster_bucket(str(m.get("title", ""))) for m in embedding_meta_sample[:500])
     embedding_clusters = [{"cluster": k, "count": v} for k, v in clusters.most_common()]
 
+    neg_inf = float("-inf")
     best_rows = sorted(
         leaderboard_rows,
-        key=lambda r: float(r.get("best_score", float("-inf"))),
+        key=lambda r: _safe_float(r.get("best_score"), neg_inf),
         reverse=True,
     )
     current_best_model = ""
-    current_best_score = float("-inf")
+    current_best_score = neg_inf
     top_task = ""
     if best_rows:
         top_task = str(best_rows[0].get("task", ""))
         current_best_model = str(best_rows[0].get("best_model", ""))
-        current_best_score = float(best_rows[0].get("best_score", float("-inf")))
+        current_best_score = _safe_float(best_rows[0].get("best_score"), neg_inf)
 
-    prev_best = float(prev_snapshot.get("global_best_score", float("-inf"))) if prev_snapshot else float("-inf")
+    prev_best = (
+        _safe_float(prev_snapshot.get("global_best_score"), neg_inf) if prev_snapshot else neg_inf
+    )
     delta = ""
     if math.isfinite(current_best_score) and math.isfinite(prev_best):
         if abs(prev_best) < 1e-9:
@@ -122,7 +160,7 @@ def build_radar_snapshot(
             delta = f"{((current_best_score - prev_best) / abs(prev_best)) * 100.0:.2f}%"
 
     hist = load_leaderboard_history_tail(120)
-    recent_scores = [float(x.get("score", 0.0)) for x in hist[-40:]]
+    recent_scores = [_safe_float(x.get("score"), 0.0) for x in hist[-40:]]
     if len(recent_scores) >= 8:
         slope = recent_scores[-1] - recent_scores[0]
         trend_signal = "rising" if slope > 0.02 else "declining" if slope < -0.02 else "stable"
@@ -147,7 +185,7 @@ def build_radar_snapshot(
     snapshot = {
         "timestamp": ts,
         "task": top_task[:160],
-        "new_papers": titles,
+        "new_papers": new_papers,
         "sota_change": {
             "previous_best": str(prev_snapshot.get("global_best_model", "")) if prev_snapshot else "",
             "new_best": current_best_model,
@@ -205,9 +243,12 @@ def run_radar_single_cycle(
         if "_relevance_score" in paper:
             score = float(max(score, float(paper.get("_relevance_score", 0.0))))
         leaderboard.update(task=task_key, model=model_key, score=score)
+        pdf_u = str(paper.get("pdf_url", "") or "")
         processed.append(
             {
                 "title": paper["title"],
+                "pdf_url": pdf_u,
+                "abs_url": abs_url_from_pdf_url(pdf_u),
                 "task_key": task_key,
                 "score": score,
                 "rank_score": float(paper.get("_relevance_score", score)),

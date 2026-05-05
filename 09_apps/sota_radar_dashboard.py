@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
+from typing import Any
 
 APPS = Path(__file__).resolve().parent
 ROOT = APPS.parent
@@ -16,11 +16,48 @@ import pandas as pd  # noqa: E402
 import streamlit as st  # noqa: E402
 
 from radar_pipeline import (  # noqa: E402
+    abs_url_from_pdf_url,
     load_leaderboard_history_tail,
     load_recent_snapshots,
     run_radar_single_cycle,
     start_radar_background_loop,
 )
+
+
+def _normalize_paper_stream(rows: list[Any]) -> list[dict[str, str]]:
+    """Support legacy snapshots where `new_papers` was a list of title strings."""
+    out: list[dict[str, str]] = []
+    for r in rows:
+        if isinstance(r, dict):
+            pdf = str(r.get("pdf_url", "") or "")
+            abs_u = str(r.get("abs_url", "") or "") or abs_url_from_pdf_url(pdf)
+            out.append(
+                {
+                    "title": str(r.get("title", "")),
+                    "pdf_url": pdf,
+                    "abs_url": abs_u,
+                    "source": str(r.get("source", "") or ("arxiv" if "arxiv.org" in pdf.lower() else "")),
+                }
+            )
+        else:
+            out.append({"title": str(r), "pdf_url": "", "abs_url": "", "source": ""})
+    return out
+
+
+def _paper_stream_markdown(entries: list[dict[str, str]]) -> str:
+    lines: list[str] = []
+    for i, e in enumerate(entries[:40], start=1):
+        title = e.get("title", "").strip() or "(untitled)"
+        abs_u = (e.get("abs_url") or "").strip()
+        pdf_u = (e.get("pdf_url") or "").strip()
+        bits: list[str] = []
+        if abs_u:
+            bits.append(f"[Abstract]({abs_u})")
+        if pdf_u:
+            bits.append(f"[PDF]({pdf_u})")
+        suffix = " · ".join(bits) if bits else "*no URL stored*"
+        lines.append(f"{i}. **{title}** — {suffix}")
+    return "\n\n".join(lines)
 
 
 def _leaderboard_table_rows() -> list[dict]:
@@ -52,21 +89,44 @@ def main() -> None:
 
     with st.sidebar:
         st.header("Controls")
+        try:
+            import arxiv  # noqa: F401
+        except ImportError:
+            st.warning(
+                "The `arxiv` package is not installed. Install it for live paper fetch: "
+                "`pip install arxiv` (see requirements.txt). Cycles still save snapshots with 0 new papers."
+            )
         interval = st.slider("Background loop interval (minutes)", min_value=5, max_value=180, value=60)
-        auto = st.toggle("Start hourly-style background loop (daemon thread)", value=False)
+        auto = st.checkbox(
+            "Start hourly-style background loop (daemon thread)",
+            value=False,
+            key="_radar_bg_checkbox",
+        )
         if auto and not st.session_state.get("_radar_bg_started"):
             th, stop_ev = start_radar_background_loop(interval_sec=int(interval * 60))
             st.session_state["_radar_bg_started"] = True
             st.session_state["_radar_stop"] = stop_ev
             st.session_state["_radar_thread"] = th
-            st.caption("Background ingestion running (daemon). Toggle off requires restart to fully stop.")
+            st.caption("Background ingestion running (daemon). Unchecking the box does not stop the thread; restart the app to stop.")
         if st.button("Run ingestion cycle now", type="primary"):
             with st.spinner("Fetching arXiv → structuring → embeddings → leaderboard…"):
                 out = run_radar_single_cycle(max_results=15)
-            st.success(f"Indexed {out['indexed']} papers; snapshot saved.")
+            ix = int(out.get("indexed") or 0)
+            if ix == 0:
+                st.info("Indexed 0 papers; snapshot still saved. Install `arxiv` if you expected live arXiv results.")
+            else:
+                st.success(f"Indexed {ix} papers; snapshot saved.")
 
     snaps = load_recent_snapshots(80)
-    latest = snaps[-1] if snaps else {}
+    latest: dict = snaps[-1] if snaps else {}
+
+    if not snaps:
+        st.info(
+            "**No radar snapshots yet.** After you run **Run ingestion cycle now** in the sidebar, "
+            "this page reads `data/radar_snapshots.jsonl`. "
+            "With `pip install arxiv`, each cycle fetches papers, updates embeddings, and fills the leaderboard. "
+            "Without `arxiv`, cycles still append a snapshot but index **0** papers."
+        )
 
     st.subheader("SOTA Shift Alerts")
     alerts = list(latest.get("alerts", []))
@@ -88,7 +148,7 @@ def main() -> None:
         st.subheader("Leaderboard (best per task)")
         rows = _leaderboard_table_rows()
         if rows:
-            st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
+            st.dataframe(pd.DataFrame(rows), use_container_width=True)
         else:
             st.write("Leaderboard empty — run an ingestion cycle.")
 
@@ -114,7 +174,10 @@ def main() -> None:
     st.subheader("Paper stream")
     papers = latest.get("new_papers") or []
     if papers:
-        st.json(papers[:40])
+        norm = _normalize_paper_stream(list(papers))
+        st.markdown(_paper_stream_markdown(norm))
+        with st.expander("Raw entries (copy-friendly)"):
+            st.json(norm[:40])
     else:
         st.write("No snapshot papers yet.")
 
@@ -126,13 +189,28 @@ def main() -> None:
     else:
         meta = _embedding_meta_tail(200)
         if meta:
-            st.caption(f"Showing latest indexed titles ({len(meta)} entries).")
-            st.json([m.get("title", "") for m in meta[-25:]])
+            st.caption(f"Latest indexed papers ({len(meta)} entries in store) with source links where present.")
+            emb_rows = []
+            for m in meta[-25:]:
+                pdf = str(m.get("pdf_url", "") or "")
+                emb_rows.append(
+                    {
+                        "title": str(m.get("title", "") or ""),
+                        "pdf_url": pdf,
+                        "abs_url": abs_url_from_pdf_url(pdf),
+                    }
+                )
+            st.markdown(_paper_stream_markdown(emb_rows))
+            with st.expander("Embedding metadata (JSON)"):
+                st.json(emb_rows)
         else:
             st.write("Embedding index empty.")
 
     st.subheader("Snapshot inspector")
-    st.json({k: v for k, v in latest.items() if k != "new_papers"})
+    if not latest:
+        st.caption("Nothing to show until at least one ingestion cycle has been saved to `data/radar_snapshots.jsonl`.")
+    else:
+        st.json({k: v for k, v in latest.items() if k != "new_papers"})
 
 
 if __name__ == "__main__":

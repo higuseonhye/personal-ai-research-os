@@ -11,8 +11,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from research_os.system_registry.base import AISystem, SystemOutput
-from research_os.system_registry.registry import SystemRegistry
+from system_registry.base import AISystem, SystemOutput
+from system_registry.registry import SystemRegistry
 
 
 def _canonical_json(obj: Any) -> str:
