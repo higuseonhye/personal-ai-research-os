@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import os
 import sys
+from importlib.util import module_from_spec, spec_from_file_location
 from pathlib import Path
 
 import pandas as pd
@@ -16,11 +17,8 @@ for p in (ROOT, APPS):
         sys.path.insert(0, str(p))
 
 
-def main() -> None:
-    st.set_page_config(page_title="Enterprise benchmarks", layout="wide")
+def render_benchmark_dashboard() -> None:
     st.title("Enterprise benchmark runs")
-
-    from importlib.util import module_from_spec, spec_from_file_location
 
     be_spec = spec_from_file_location("benchmark_backend_ui", ROOT / "08_feedback_loop" / "benchmark_backend.py")
     be_mod = module_from_spec(be_spec)
@@ -35,7 +33,7 @@ def main() -> None:
     )
 
     tid_default = os.environ.get("PA_TENANT_ID", "default")
-    tenant_id = st.sidebar.text_input("Tenant id", value=tid_default)
+    tenant_id = st.sidebar.text_input("Tenant id (benchmarks)", value=tid_default)
 
     db_default = store.default_benchmark_db_path()
     db_help = "SQLite DB path (ignored when backend=postgres)" if backend == "postgres" else "SQLite DB path"
@@ -114,6 +112,11 @@ def main() -> None:
                 for x in failures[:50]
             ]
         )
+
+
+def main() -> None:
+    st.set_page_config(page_title="Enterprise benchmarks", layout="wide")
+    render_benchmark_dashboard()
 
 
 if __name__ == "__main__":

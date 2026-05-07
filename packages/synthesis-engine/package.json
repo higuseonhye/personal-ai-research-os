@@ -1,0 +1,23 @@
+{
+  "name": "@pa/synthesis-engine",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "node -e \"console.log('no lint yet')\""
+  },
+  "dependencies": {
+    "@pa/reasoning-engine": "file:../reasoning-engine"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  }
+}
+

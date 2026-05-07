@@ -83,12 +83,11 @@ def _embedding_meta_tail(limit: int = 400) -> list[dict]:
     return meta[-limit:]
 
 
-def main() -> None:
-    st.set_page_config(page_title="SOTA Radar", layout="wide")
+def render_sota_radar_dashboard() -> None:
     st.title("SOTA Radar — Live Research Intelligence")
 
     with st.sidebar:
-        st.header("Controls")
+        st.header("Radar controls")
         try:
             import arxiv  # noqa: F401
         except ImportError:
@@ -211,6 +210,11 @@ def main() -> None:
         st.caption("Nothing to show until at least one ingestion cycle has been saved to `data/radar_snapshots.jsonl`.")
     else:
         st.json({k: v for k, v in latest.items() if k != "new_papers"})
+
+
+def main() -> None:
+    st.set_page_config(page_title="SOTA Radar", layout="wide")
+    render_sota_radar_dashboard()
 
 
 if __name__ == "__main__":

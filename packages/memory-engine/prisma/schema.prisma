@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model ResearchSession {
+  id          String   @id @default(cuid())
+  problem     String
+  currentGoal String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  stateSnapshots  ResearchStateSnapshot[]
+  unknowns        UnknownRecord[]
+  decisions       DecisionRecordRow[]
+  insightNodes    InsightNodeRow[]
+  syntheses       SynthesisSummaryRow[]
+
+  @@map("research_sessions")
+}
+
+model ResearchStateSnapshot {
+  id         String   @id @default(cuid())
+  sessionId  String
+  createdAt  DateTime @default(now())
+  snapshot   Json
+  confidence Float?
+
+  session ResearchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("research_state_snapshots")
+}
+
+model UnknownRecord {
+  id               String   @id @default(cuid())
+  sessionId         String
+  createdAt         DateTime @default(now())
+  description       String
+  severity          String
+  blockingDegree    Int
+  proposedResolution String?
+
+  session ResearchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("unknowns")
+}
+
+model DecisionRecordRow {
+  id                  String   @id @default(cuid())
+  sessionId            String
+  createdAt            DateTime @default(now())
+  decision             String
+  rationale            String
+  tradeoffs            Json
+  rejectedAlternatives Json?
+  revisitCondition     String?
+
+  session ResearchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("decisions")
+}
+
+model InsightNodeRow {
+  id                   String   @id @default(cuid())
+  sessionId             String
+  createdAt             DateTime @default(now())
+  source               String
+  type                 String
+  mainClaim            String
+  whyRelevant          String
+  possibleApplications Json
+  relatedTopics        Json
+  openQuestions        Json?
+  confidence           Float?
+
+  session ResearchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("insight_nodes")
+}
+
+model SynthesisSummaryRow {
+  id        String   @id @default(cuid())
+  sessionId String
+  createdAt DateTime @default(now())
+  summary   Json
+
+  session ResearchSession @relation(fields: [sessionId], references: [id], onDelete: Cascade)
+
+  @@index([sessionId, createdAt])
+  @@map("synthesis_summaries")
+}
+

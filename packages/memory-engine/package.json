@@ -1,0 +1,28 @@
+{
+  "name": "@pa/memory-engine",
+  "version": "0.0.1",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist",
+    "prisma"
+  ],
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "prisma:generate": "dotenv -e ../../.env -- prisma generate",
+    "prisma:migrate": "dotenv -e ../../.env -- prisma db push",
+    "lint": "node -e \"console.log('no lint yet')\""
+  },
+  "dependencies": {
+    "@pa/reasoning-engine": "file:../reasoning-engine",
+    "@prisma/client": "^6.19.3",
+    "zod": "^3.25.0"
+  },
+  "devDependencies": {
+    "prisma": "^6.8.2",
+    "typescript": "^5.6.3"
+  }
+}

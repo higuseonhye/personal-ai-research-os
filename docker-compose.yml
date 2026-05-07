@@ -1,0 +1,20 @@
+services:
+  db:
+    image: postgres:16
+    container_name: pa_research_os_db
+    environment:
+      POSTGRES_DB: pa_research_os
+      POSTGRES_USER: pa
+      POSTGRES_PASSWORD: pa_password
+    ports:
+      - "5432:5432"
+    volumes:
+      - pa_research_os_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U pa -d pa_research_os"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  pa_research_os_pgdata:

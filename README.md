@@ -1,100 +1,127 @@
-# Personal AI Research & Execution OS
+# Personal AI Research OS
 
-Local-first Python toolkit for turning **customer problems → structured research tasks → multi-system experiments → evaluation → insights → durable memory**.
+Most AI systems optimize **information retrieval** and **summarization**.
 
-## Principles
+This project explores a harder problem:
+**How do we prevent reasoning collapse during complex research and problem‑solving workflows?**
 
-- **One interface for every system:** `AISystem.run(input: dict) -> SystemOutput` for retrieval, LLM/RAG, multimodal, agents, and business models.
-- **Reproducible runs:** seeded experiments, JSONL logs, SQLite memory.
-- **No SaaS requirement:** metrics, local judge proxies, and template QA run without external APIs (you can swap in your own models later).
+When a research thread gets long, synthesis becomes expensive: uncertainty piles up, assumptions drift, decisions get lost, and you end up re-thinking the same paths. The result is **synthesis fatigue** and **reasoning discontinuity**.
 
-## Screenshots
+**Personal AI Research OS** is a *reasoning workflow system* focused on:
+- **Reasoning continuity**: keep the exploration state coherent over time.
+- **Uncertainty tracking**: make unknowns explicit and actionable.
+- **Decision traceability**: preserve what you decided and why.
+- **Synthesis support**: compress complexity into next-best actions without “replacing thinking”.
 
-**Enterprise pipeline** (`streamlit run 09_apps/streamlit_ui.py`) and **benchmark runs** (`streamlit run 09_apps/benchmark_dashboard.py`) — representative layouts:
+## What it outputs (product contract)
+Given a research/problem-solving prompt, the OS aims to maintain a persistent state and produce:
+- **ResearchState** (current goal, knowns/unknowns, assumptions, constraints, candidate paths, blockers, confidence)
+- **Unknowns** (severity, blocking degree, proposed resolution)
+- **DecisionJournal** (decision + rationale + tradeoffs + revisit conditions)
+- **InsightNodes** (inbox items transformed into structured claims + relevance + open questions)
+- **SynthesisSummary** (themes, risk hotspots, divergence warnings, next-best actions)
 
-![Enterprise pipeline (left) and benchmark dashboard (right)](assets/readme-dashboards.png)
+## Why existing tools fail
+Chat + RAG tools are great at *one-shot answers*, but they struggle when:
+- the problem is ambiguous and requires iterative framing,
+- the workflow branches into multiple candidate paths,
+- you need to revisit earlier decisions after new evidence arrives,
+- you need to keep uncertainty visible instead of “papering over” it with fluent text.
 
-**SOTA Radar** (`streamlit run 09_apps/sota_radar_dashboard.py`): arXiv ingestion cycles, leaderboard trends, snapshots; **Paper stream** lists **Abstract** and **PDF** links when URLs are present.
+They don’t preserve the *shape* of your reasoning. This OS does.
 
-![SOTA Radar — paper stream with source links](assets/sota-radar-dashboard.png)
+## Architecture (MVP)
 
-**Research IR dashboard** (`streamlit run ui/app.py`): compile a problem, pick systems, paste JSON input, then review results in the **Results** tab.
-
-![Research OS — Problem & systems tab](assets/research-os-dashboard.png)
-
-## Layout
-
-| Path | Purpose |
-|------|---------|
-| `09_apps/` | Streamlit apps: enterprise pipeline, benchmark history, SOTA radar. |
-| `pipeline.py` | Enterprise runner (full / LangGraph / production entrypoints). |
-| `problem_compiler/` | Natural language → structured task (domain, hypotheses, suggested systems). |
-| `system_registry/` | `AISystem` implementations and registry. |
-| `experiment_engine/` | Run the same input across selected systems; append-only logs under `data/logs/`. |
-| `evaluation_engine/` | Recall@k, MRR, nDCG@k, accuracy-style checks, local judge dimensions, pairwise comparisons. |
-| `insight_engine/` | Research-style narrative: best system, ranking, hypotheses, next steps, failure hooks. |
-| `memory/` | SQLite store for experiments, evaluations, insights, failures, and performance history. |
-| `ui/` | Streamlit dashboard for fast iteration. |
-| `main.py` | CLI demo of the full pipeline. |
-
-## Requirements
-
-- **Python 3.10+** (3.10–3.12 recommended for `torch` / `sentence-transformers` stability).
-
-## Install
-
-From the directory that **contains** this folder (if this repo is named `research_os` inside a parent project):
-
-```bash
-pip install -r research_os/requirements.txt
+```mermaid
+flowchart TD
+  userInput[UserInput] --> inbox[ResearchInbox]
+  inbox --> insightNodes[InsightNodes]
+  userInput --> state[ResearchState]
+  insightNodes --> synthesis[SynthesisEngine]
+  state --> synthesis
+  synthesis --> nextActions[NextBestActions]
+  state --> memory[PersistentStore]
+  insightNodes --> memory
+  synthesis --> memory
+  decisions[DecisionJournal] --> memory
 ```
 
-If you cloned this repo so that **this folder is your project root** (this README sits next to `main.py`):
+## Quickstart (new product)
+This repo is being refactored into a **TypeScript + Postgres (Supabase)** product with a single web entrypoint.
+
+- **Prereqs**: Node 18+, a Supabase Postgres project, and a `DATABASE_URL`.
+- **Env**: set `DATABASE_URL` in `.env` (see `.env.example`).
+
+### Local DB (Docker) — recommended for demo
+Start Postgres locally:
+
+```bash
+docker compose up -d
+```
+
+Copy `.env.example` → `.env` and keep the provided local `DATABASE_URL`.
+
+### Run
+Install dependencies:
+
+```bash
+npm install
+```
+
+Generate Prisma client + run migrations (requires a reachable Postgres via `DATABASE_URL`):
+
+```bash
+npm run prisma:generate
+npm run db:migrate
+```
+
+Start the web app:
+
+```bash
+npm run dev
+```
+
+Optional: seed a demo session:
+
+```bash
+npm run seed
+```
+
+## Workflow examples
+
+### Example: “Improve RAG retrieval quality for internal docs”
+The OS should help you:
+- keep a stable **problem framing** (what “quality” means: recall@k, answer groundedness, latency),
+- track **unknowns** (dataset quality, ACL behavior, chunking policy, eval harness),
+- journal decisions (BM25+dense fusion vs dense-only; reranker tradeoffs),
+- produce a synthesis that says things like:
+  - “You are repeatedly exploring retrieval vs reranking; define an evaluation set before tuning.”
+  - “Highest-risk assumption: relevance labels represent your real user distribution.”
+  - “Next action: build a 200-query eval set + run ablations: chunk size, hybrid weights, reranker on/off.”
+
+## Repo structure (target)
+- `apps/` (web product entrypoint)
+- `packages/` (reasoning, synthesis, memory, uncertainty modules)
+- `docs/` (philosophy, architecture, workflows, prompts)
+
+## Legacy demos (still available)
+This repo also contains earlier Python-first research/benchmark demos (kept runnable while the new product is built):
 
 ```bash
 pip install -r requirements.txt
-```
 
-## Run
-
-**CLI (one-shot pipeline):**
-
-```bash
-# From repo root (this folder is next to main.py):
-python main.py --systems BM25Retriever DenseRetriever HybridRetriever
-```
-
-**Streamlit UIs:**
-
-```bash
-# Enterprise problem → decomposition → SOTA → architecture → eval → iteration
+# Enterprise pipeline UI
 streamlit run 09_apps/streamlit_ui.py
 
-# Benchmark history (SQLite / Postgres via env)
+# Benchmark dashboard
 streamlit run 09_apps/benchmark_dashboard.py
 
-# SOTA radar (papers / leaderboard snapshots)
+# SOTA radar
 streamlit run 09_apps/sota_radar_dashboard.py
 
-# Research OS — IR-style experiments across registered systems
+# IR experiment dashboard
 streamlit run ui/app.py
 ```
 
-Use **`09_apps/streamlit_ui`** for the JSON-first enterprise pipeline. Use **`ui/app`** — **Problem & systems** tab to compile a problem, pick systems, paste JSON input (IR-style: `query`, `corpus`, optional `relevant_ids`, `top_k`), then run. Open **Results** for tables, pairwise output, insights, and failure snapshots.
-
-## Input hints
-
-- **IR-style systems** expect keys like `query`, `corpus` (`[{ "id", "text" }]`), optional `relevant_ids` for metrics, and `top_k`.
-- **LLM/RAG** expect `question` and usually `corpus` for `RAGSystem`.
-- **Agents** expect `task` (and optional `tools`).
-- **Business** models expect their documented keys (`candidates`, `rows`, `catalog`, etc.)—see `system_registry/systems/`.
-
-## Adding a system
-
-1. Subclass `AISystem` in `system_registry/systems/`.
-2. Register in `get_default_registry()` in `system_registry/registry.py`.
-3. Optionally extend `ProblemCompiler` so new systems appear in `suggested_systems`.
-
 ## License
-
 Released under the [MIT License](LICENSE).

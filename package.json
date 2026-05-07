@@ -1,0 +1,24 @@
+{
+  "name": "personal-ai-research-os",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Uncertainty-Aware Research & Synthesis OS.",
+  "scripts": {
+    "dev": "npm run dev -w apps/web",
+    "build": "npm run build -ws",
+    "lint": "npm run lint -ws",
+    "typecheck": "npm run typecheck -ws",
+    "prisma:generate": "npm run prisma:generate -w packages/memory-engine",
+    "db:migrate": "npm run prisma:migrate -w packages/memory-engine",
+    "seed": "tsx scripts/seed.ts",
+    "smoke": "tsx scripts/smoke.ts"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "devDependencies": {
+    "dotenv-cli": "^8.0.0",
+    "tsx": "^4.20.5"
+  }
+}

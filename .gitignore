@@ -25,6 +25,9 @@ data/benchmark_metrics.prom
 data/route_policy.json
 data/sota_ranker_state.json
 
+# New OS runtime artifacts
+data/*.json
+
 # IDE
 .idea/
 .vscode/
@@ -35,3 +38,7 @@ data/sota_ranker_state.json
 .cache/
 *.pt
 *.bin
+node_modules/
+.next/
+dist/
+*.tsbuildinfo
